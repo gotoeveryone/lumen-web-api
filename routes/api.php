@@ -16,8 +16,8 @@ use Illuminate\Http\Request;
 Route::get('/', 'StatesController@index');
 
 Route::group(['prefix' => 'auth/'], function() {
-    Route::post('/login', 'UsersController@login');
-    Route::delete('/logout', 'UsersController@logout');
+    Route::post('/login', 'AuthController@login');
+    Route::delete('/logout', 'AuthController@logout');
 });
 
-Route::middleware('hastoken')->get('/users/{id}', 'UsersController@users');
+Route::middleware('hastoken')->get('/users', 'UsersController@users');

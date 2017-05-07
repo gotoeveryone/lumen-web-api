@@ -45,6 +45,7 @@ class AuthController extends Controller
         // Redisへ保存
         if (env('REDIS_HOST')) {
             Redis::set($token, json_encode([
+                'id' => $user->id,
                 'account' => $account,
                 'environment' => env('APP_ENV'),
             ]));

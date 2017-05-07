@@ -24,7 +24,7 @@ class HasToken
     public function handle($request, Closure $next, $guard = null)
     {
         // トークンが取得できない
-        if (!($token = $request->has('access_token'))) {
+        if (!($token = $request->get('access_token'))) {
             return $this->error(403, 'Access token is invalid');
         }
 
@@ -38,6 +38,7 @@ class HasToken
             return $this->error(403, 'Access token is invalid');
         }
 
+        $request->setJson($json);
         return $next($request);
     }
 

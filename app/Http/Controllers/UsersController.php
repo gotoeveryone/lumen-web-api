@@ -17,12 +17,12 @@ class UsersController extends Controller
      * ユーザを取得
      *
      * @param Request $request
-     * @param int $id
      * @return Response
      */
-    public function users(Request $request, int $id)
+    public function users(Request $request)
     {
-        if (!($user = User::where('is_active', true)->find($id))) {
+        $data = $request->json();
+        if (!($user = User::where('is_active', true)->find($data['id']))) {
             return response('', 404);
         }
 
