@@ -15,3 +15,6 @@ define('LARAVEL_START', microtime(true));
 */
 
 require __DIR__.'/../vendor/autoload.php';
+
+$dotEnv = new \Dotenv\Dotenv(__DIR__.'/..');
+$dotEnv->overload();
