@@ -2,13 +2,26 @@
 
 namespace App\Models;
 
-use Auth;
+use Carbon\Carbon;
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Auth\Authenticatable;
+use Illuminate\Auth\Passwords\CanResetPassword;
+use Illuminate\Foundation\Auth\Access\Authorizable;
+use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
+use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
+use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
 
-class User extends Authenticatable
+class User extends BaseModel implements
+    AuthenticatableContract, AuthorizableContract, CanResetPasswordContract
 {
-    use Notifiable;
+    use Authenticatable, Authorizable, CanResetPassword, Notifiable;
+
+    /**
+     * 当モデルでは登録・更新日付を利用しない
+     * 
+     * @var boolean
+     */
+    public $timestamps = false;
 
     /**
      * The attributes that are mass assignable.
@@ -25,22 +38,8 @@ class User extends Authenticatable
      * @var array
      */
     protected $hidden = [
-        'password', 'remember_token',
+        'password',
     ];
-
-    /**
-     * 登録時に日時を記録するカラム
-     * 
-     * @var string
-     */
-    const CREATED_AT = 'created';
-
-    /**
-     * 登録・更新時に日時を記録するカラム
-     * 
-     * @var string
-     */
-    const UPDATED_AT = 'modified';
 
     /**
      * ユーザIDを取得します。
@@ -49,6 +48,20 @@ class User extends Authenticatable
      */
     public function getUserId()
     {
-        return $this->userId;
+        return $this->userId || $this->account;
+    }
+
+    /**
+     * ログイン処理
+     *
+     * @return bool
+     */
+    public function logged()
+    {
+        $logged = Carbon::now();
+        $this->last_logged = $logged;
+        $this->modified = $logged;
+        $this->modified_by = $this->account;
+        return $this->save();
     }
 }

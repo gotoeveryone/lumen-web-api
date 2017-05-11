@@ -2,9 +2,10 @@
 
 namespace App\Http\Middleware;
 
-use Redis;
+use Log;
 use Closure;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Token;
 
 /**
  * トークンを保持しているかをチェックします。
@@ -24,21 +25,12 @@ class HasToken
     public function handle($request, Closure $next, $guard = null)
     {
         // トークンが取得できない
-        if (!($token = $request->get('access_token'))) {
+        if (!($token = $request->get('access_token')) || !($data = Token::getData($token))) {
+            Log::warning('認証エラー');
             return $this->error(403, 'Access token is invalid');
         }
 
-        // トークンからデータが取得できない
-        if (!($body = Redis::get($token)) || !($json = json_decode($body, true))) {
-            return $this->error(403, 'Access token is invalid');
-        }
-
-        // 取得したデータと実行環境が不一致
-        if (!isset($json['environment']) || $json['environment'] !== env('APP_ENV')) {
-            return $this->error(403, 'Access token is invalid');
-        }
-
-        $request->setJson($json);
+        $request->setJson($data);
         return $next($request);
     }
 
