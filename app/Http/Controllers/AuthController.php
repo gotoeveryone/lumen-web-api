@@ -7,6 +7,7 @@ use Redis;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Carbon\Carbon;
+use App\Models\Token;
 use App\Models\User;
 
 /**
@@ -36,21 +37,11 @@ class AuthController extends Controller
             ], 403);
         }
 
-        $user->last_logged = Carbon::now();
-        $user->save();
+        // データのログイン処理
+        $user->logged();
 
-        // トークンを取得
-        $token = str_random(50);
-
-        // Redisへ保存
-        if (env('REDIS_HOST')) {
-            Redis::set($token, json_encode([
-                'id' => $user->id,
-                'account' => $account,
-                'environment' => env('APP_ENV'),
-            ]));
-            Redis::expire($token, 600);
-        }
+        // トークンの生成
+        $token = Token::createToken($user);
 
         // トークンを返す
         return response([
@@ -66,11 +57,7 @@ class AuthController extends Controller
      */
     public function logout(Request $request)
     {
-        $token = $request->get('access_token');
-        if ($token && Redis::get($token)) {
-            Redis::del($token);
-        }
-
+        Token::deleteToken($request->get('access_token'));
         return response('', 204);
     }
 }

@@ -22,7 +22,7 @@ class UsersController extends Controller
     public function users(Request $request)
     {
         $data = $request->json();
-        if (!($user = User::where('is_active', true)->find($data['id']))) {
+        if (!($user = User::where('is_active', true)->find($data->user_id))) {
             return response('', 404);
         }
 
