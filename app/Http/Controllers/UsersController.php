@@ -27,6 +27,7 @@ class UsersController extends Controller
         }
 
         return response([
+            'id' => $user->id,
             'userId' => $user->account,
             'userName' => $user->name,
             'sex' => $user->sex,
