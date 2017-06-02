@@ -4,15 +4,9 @@ namespace App\Http\Middleware;
 
 use Log;
 use Closure;
-use Illuminate\Support\Facades\Auth;
 use App\Models\Token;
 
-/**
- * トークンを保持しているかをチェックします。
- * 
- * @author Kazuki_Kamizuru
- */
-class HasToken
+class Authenticate
 {
     /**
      * ハンドラ

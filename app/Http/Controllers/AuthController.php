@@ -2,8 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use Hash;
-use Redis;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Carbon\Carbon;
@@ -30,7 +28,7 @@ class AuthController extends Controller
 
         // ユーザが取得できない、またはパスワードが異なる場合は403
         $user = User::where('account', $account)->first();
-        if (!$user || !Hash::check($password, $user->password)) {
+        if (!$user || !app('hash')->check($password, $user->password)) {
             return response([
                 'code' => 403,
                 'message' => 'Invalid user.',

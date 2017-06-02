@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Carbon\Carbon;
 
 /**
  * 監視用コントローラ
@@ -25,7 +24,8 @@ class StatesController extends Controller
             'status' => 'OK',
             'environment' => env('APP_ENV'),
             'logLevel' => env('APP_LOG_LEVEL'),
-            'timeZone' => Carbon::now()->getTimezone()->getName(),
+            'timeZone' => env('APP_TIMEZONE'),
+            'test' => \Carbon\Carbon::now(),
         ], 200);
     }
 }
