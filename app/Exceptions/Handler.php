@@ -8,6 +8,8 @@ use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Laravel\Lumen\Exceptions\Handler as ExceptionHandler;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
 class Handler extends ExceptionHandler
 {
@@ -45,6 +47,22 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Exception $e)
     {
-        return parent::render($request, $e);
+        $code = 500;
+        $message = $e->getMessage();
+        $default = 'Unknown Error';
+        if ($e instanceof ModelNotFoundException || $e instanceof NotFoundHttpException) {
+            $code = 404;
+            $default = 'Not Found';
+        } elseif ($e instanceof MethodNotAllowedHttpException) {
+            $code = 405;
+            $default = 'Method Not Allowed';
+        } elseif ($e instanceof ValidationException) {
+            $code = 400;
+            $default = 'Bad Request';
+        }
+        return response([
+            'code' => $code,
+            'message' => $message ? $message : $default,
+        ], $code);
     }
 }
