@@ -2,7 +2,6 @@
 
 namespace App\Http\Middleware;
 
-use Log;
 use Closure;
 use App\Models\Token;
 
@@ -25,7 +24,6 @@ class Authenticate
     {
         // トークンが取得できない
         if (!($token = $request->get('access_token')) || !($data = Token::getData($token))) {
-            Log::warning('認証エラー');
             abort(403, 'Access token is invalid');
         }
 

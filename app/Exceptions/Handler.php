@@ -3,6 +3,7 @@
 namespace App\Exceptions;
 
 use Exception;
+use Log;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -60,9 +61,14 @@ class Handler extends ExceptionHandler
             $code = $e->getStatusCode();
             $default = $this->getDefault($code);
         }
+
+        $showMessage = $message ? $message : $default;
+        Log::error("${code}: ${showMessage}");
+        Log::error(var_export($request->all(), true));
+
         return response([
             'code' => $code,
-            'message' => $message ? $message : $default,
+            'message' => $showMessage,
         ], $code);
     }
 
