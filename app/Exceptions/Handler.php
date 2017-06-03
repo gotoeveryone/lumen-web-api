@@ -3,8 +3,14 @@
 namespace App\Exceptions;
 
 use Exception;
-use Illuminate\Auth\AuthenticationException;
-use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Log;
+use Illuminate\Validation\ValidationException;
+use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Laravel\Lumen\Exceptions\Handler as ExceptionHandler;
+use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
 class Handler extends ExceptionHandler
 {
@@ -14,12 +20,10 @@ class Handler extends ExceptionHandler
      * @var array
      */
     protected $dontReport = [
-        \Illuminate\Auth\AuthenticationException::class,
-        \Illuminate\Auth\Access\AuthorizationException::class,
-        \Symfony\Component\HttpKernel\Exception\HttpException::class,
-        \Illuminate\Database\Eloquent\ModelNotFoundException::class,
-        \Illuminate\Session\TokenMismatchException::class,
-        \Illuminate\Validation\ValidationException::class,
+        AuthorizationException::class,
+        HttpException::class,
+        ModelNotFoundException::class,
+        ValidationException::class,
     ];
 
     /**
@@ -27,39 +31,67 @@ class Handler extends ExceptionHandler
      *
      * This is a great spot to send exceptions to Sentry, Bugsnag, etc.
      *
-     * @param  \Exception  $exception
+     * @param  \Exception  $e
      * @return void
      */
-    public function report(Exception $exception)
+    public function report(Exception $e)
     {
-        parent::report($exception);
+        parent::report($e);
     }
 
     /**
      * Render an exception into an HTTP response.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \Exception  $exception
+     * @param  \Exception  $e
      * @return \Illuminate\Http\Response
      */
-    public function render($request, Exception $exception)
+    public function render($request, Exception $e)
     {
-        return parent::render($request, $exception);
+        $code = 500;
+        $message = $e->getMessage();
+        $default = 'Unknown Error';
+        if ($e instanceof ModelNotFoundException) {
+            $code = 404;
+            $default = 'Not Found';
+        } elseif ($e instanceof ValidationException) {
+            $code = 400;
+            $default = 'Bad Request';
+        } elseif ($e instanceof HttpException) {
+            $code = $e->getStatusCode();
+            $default = $this->getDefault($code);
+        }
+
+        $showMessage = $message ? $message : $default;
+        Log::error("${code}: ${showMessage}");
+        Log::error(var_export($request->all(), true));
+
+        return response([
+            'code' => $code,
+            'message' => $showMessage,
+        ], $code);
     }
 
     /**
-     * Convert an authentication exception into an unauthenticated response.
+     * ステータスコードから、デフォルトのメッセージを取得します。
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Illuminate\Auth\AuthenticationException  $exception
-     * @return \Illuminate\Http\Response
+     * @param int $code
+     * @return string メッセージ
      */
-    protected function unauthenticated($request, AuthenticationException $exception)
+    private function getDefault(int $code)
     {
-        if ($request->expectsJson()) {
-            return response()->json(['error' => 'Unauthenticated.'], 401);
+        switch ($code) {
+            case 400:
+                return 'Bad Request';
+            case 401:
+                return 'Unauthorized';
+            case 403:
+                return 'Access Denied';
+            case 404:
+                return 'Not Found';
+            case 405:
+                return 'Method Not Allowed';
         }
-
-        return redirect()->guest(route('login'));
+        return 'Unknown Error';
     }
 }

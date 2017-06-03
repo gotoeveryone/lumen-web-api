@@ -2,11 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use Hash;
-use Redis;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Carbon\Carbon;
 use App\Models\Token;
 use App\Models\User;
 
@@ -25,19 +22,21 @@ class AuthController extends Controller
      */
     public function login(Request $request)
     {
+        $this->validate($request, [
+            'account' => 'required|max:20',
+            'password' => 'required|max:40',
+        ]);
+
         $account = $request->get('account');
         $password = $request->get('password');
 
         // ユーザが取得できない、またはパスワードが異なる場合は403
-        $user = User::where('account', $account)->first();
-        if (!$user || !Hash::check($password, $user->password)) {
-            return response([
-                'code' => 403,
-                'message' => 'Invalid user.',
-            ], 403);
+        $user = User::where('account', $account)->where('is_active', true)->first();
+        if (!$user || !app('hash')->check($password, $user->password)) {
+            abort(403, 'Invalid user.');
         }
 
-        // データのログイン処理
+        // ログイン処理
         $user->logged();
 
         // トークンの生成
@@ -57,6 +56,10 @@ class AuthController extends Controller
      */
     public function logout(Request $request)
     {
+        $this->validate($request, [
+            'access_token' => 'required|max:50',
+        ]);
+
         Token::deleteToken($request->get('access_token'));
         return response('', 204);
     }

@@ -19,11 +19,11 @@ class UsersController extends Controller
      * @param Request $request
      * @return Response
      */
-    public function users(Request $request)
+    public function index(Request $request)
     {
         $data = $request->json();
         if (!($user = User::where('is_active', true)->find($data->user_id))) {
-            return response('', 404);
+            abort(404, 'Invalid user.');
         }
 
         return response([
