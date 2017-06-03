@@ -50,19 +50,42 @@ class Handler extends ExceptionHandler
         $code = 500;
         $message = $e->getMessage();
         $default = 'Unknown Error';
-        if ($e instanceof ModelNotFoundException || $e instanceof NotFoundHttpException) {
+        if ($e instanceof ModelNotFoundException) {
             $code = 404;
             $default = 'Not Found';
-        } elseif ($e instanceof MethodNotAllowedHttpException) {
-            $code = 405;
-            $default = 'Method Not Allowed';
         } elseif ($e instanceof ValidationException) {
             $code = 400;
             $default = 'Bad Request';
+        } elseif ($e instanceof HttpException) {
+            $code = $e->getStatusCode();
+            $default = $this->getDefault($code);
         }
         return response([
             'code' => $code,
             'message' => $message ? $message : $default,
         ], $code);
+    }
+
+    /**
+     * ステータスコードから、デフォルトのメッセージを取得します。
+     *
+     * @param int $code
+     * @return string メッセージ
+     */
+    private function getDefault(int $code)
+    {
+        switch ($code) {
+            case 400:
+                return 'Bad Request';
+            case 401:
+                return 'Unauthorized';
+            case 403:
+                return 'Access Denied';
+            case 404:
+                return 'Not Found';
+            case 405:
+                return 'Method Not Allowed';
+        }
+        return 'Unknown Error';
     }
 }

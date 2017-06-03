@@ -25,7 +25,6 @@ class StatesController extends Controller
             'environment' => env('APP_ENV'),
             'logLevel' => env('APP_LOG_LEVEL'),
             'timeZone' => env('APP_TIMEZONE'),
-            'test' => \Carbon\Carbon::now(),
         ], 200);
     }
 }

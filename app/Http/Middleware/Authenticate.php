@@ -6,6 +6,11 @@ use Log;
 use Closure;
 use App\Models\Token;
 
+/**
+ * 認証情報のチェックを行います。
+ * 
+ * @author Kazuki_Kamizuru
+*/
 class Authenticate
 {
     /**
@@ -21,25 +26,10 @@ class Authenticate
         // トークンが取得できない
         if (!($token = $request->get('access_token')) || !($data = Token::getData($token))) {
             Log::warning('認証エラー');
-            return $this->error(403, 'Access token is invalid');
+            abort(403, 'Access token is invalid');
         }
 
         $request->setJson($data);
         return $next($request);
-    }
-
-    /**
-     * エラー時のレスポンスを取得します。
-     *
-     * @param int $code
-     * @param string $message
-     * @return Response
-     */
-    private function error($code = 500, $message = 'Internal Server Error.')
-    {
-        return response([
-            'code' => $code,
-            'message' => $message,
-        ], 403);
     }
 }

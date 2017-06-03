@@ -23,7 +23,7 @@ class UsersController extends Controller
     {
         $data = $request->json();
         if (!($user = User::where('is_active', true)->find($data->user_id))) {
-            return response('', 404);
+            abort(404, 'Invalid user.');
         }
 
         return response([
