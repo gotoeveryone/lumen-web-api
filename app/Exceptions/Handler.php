@@ -50,19 +50,15 @@ class Handler extends ExceptionHandler
     {
         $code = 500;
         $message = $e->getMessage();
-        $default = 'Unknown Error';
         if ($e instanceof ModelNotFoundException) {
             $code = 404;
-            $default = 'Not Found';
         } elseif ($e instanceof ValidationException) {
             $code = 400;
-            $default = 'Bad Request';
         } elseif ($e instanceof HttpException) {
             $code = $e->getStatusCode();
-            $default = $this->getDefault($code);
         }
 
-        $showMessage = $message ? $message : $default;
+        $showMessage = $message ? $message : $this->getDefault($code);
         Log::error("${code}: ${showMessage}");
         Log::error(var_export($request->all(), true));
 

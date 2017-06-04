@@ -27,7 +27,8 @@ class Authenticate
             abort(403, 'Access token is invalid');
         }
 
-        $request->setJson($data);
+        // 取得したデータをリクエストに付与
+        $request->merge($data);
         return $next($request);
     }
 }

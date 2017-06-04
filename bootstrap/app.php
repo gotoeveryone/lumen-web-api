@@ -3,7 +3,7 @@
 require_once __DIR__.'/../vendor/autoload.php';
 
 try {
-    (new Dotenv\Dotenv(__DIR__.'/../'))->load();
+    (new Dotenv\Dotenv(__DIR__.'/../'))->overload();
 } catch (Dotenv\Exception\InvalidPathException $e) {
     //
 }
@@ -23,7 +23,12 @@ $app = new App\MyApplication(
     realpath(__DIR__.'/../')
 );
 
-$app->withFacades();
+$app->configure('mail');
+
+$app->withFacades(true, [
+    'Illuminate\Support\Facades\Mail' => 'Mail',
+    'Illuminate\Support\Facades\Redis' => 'Redis',
+]);
 
 $app->withEloquent();
 
@@ -80,7 +85,8 @@ $app->routeMiddleware([
 
 // $app->register(App\Providers\AppServiceProvider::class);
 // $app->register(App\Providers\AuthServiceProvider::class);
-// $app->register(App\Providers\EventServiceProvider::class);
+$app->register(App\Providers\EventServiceProvider::class);
+$app->register(Illuminate\Mail\MailServiceProvider::class);
 $app->register(Illuminate\Redis\RedisServiceProvider::class);
 
 /*
