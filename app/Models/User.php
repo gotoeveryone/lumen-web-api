@@ -63,4 +63,18 @@ class User extends BaseModel implements
         $this->modified_by = $this->account;
         return $this->save();
     }
+
+    /**
+     * アクティブユーザを取得します。
+     *
+     * @param int $userId
+     * @return User|null
+     */
+    public static function getActiveUser(int $userId)
+    {
+        if (!($user = self::where('is_active', true)->find($userId))) {
+            abort(403, 'Invalid user.');
+        }
+        return $user;
+    }
 }

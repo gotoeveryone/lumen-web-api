@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Redis;
 use Carbon\Carbon;
 
 class Token extends BaseModel
@@ -45,12 +46,11 @@ class Token extends BaseModel
 
         // Redisへ保存
         if (self::useRedis()) {
-            $redis = app('redis');
-            $redis->set($token, json_encode([
+            Redis::set($token, json_encode([
                 'user_id' => $user->id,
                 'environment' => env('APP_ENV'),
             ]));
-            $redis->expire($token, 600);
+            Redis::expire($token, 600);
             return $token;
         }
 
@@ -73,10 +73,9 @@ class Token extends BaseModel
     public static function getData(string $token)
     {
         if (self::useRedis()) {
-            $redis = app('redis');
             // データが取得できない
             // 有効期限切れの場合も同様
-            if (!($body = $redis->get($token)) || !($res = json_decode($body))) {
+            if (!($body = Redis::get($token)) || !($res = json_decode($body))) {
                 return false;
             }
         } else {
@@ -96,7 +95,7 @@ class Token extends BaseModel
             return false;
         }
 
-        return $res;
+        return (array) $res;
     }
 
     /**
@@ -109,9 +108,8 @@ class Token extends BaseModel
     {
         // Redisから削除
         if (self::useRedis()) {
-            $redis = app('redis');
-            if ($token && $redis->get($token)) {
-                $redis->del($token);
+            if ($token && Redis::get($token)) {
+                Redis::del($token);
             }
             return;
         }

@@ -22,5 +22,6 @@ $app->group(['prefix' => 'v1'], function($app) {
 
     $app->group(['middleware' => 'auth'], function($app) {
         $app->get('/users', 'UsersController@index');
+        $app->post('/mail', 'MailController@sendmail');
     });
 });

@@ -8,7 +8,7 @@ use App\Models\User;
 
 /**
  * ユーザコントローラ
- * 
+ *
  * @author Kazuki_Kamizuru
  */
 class UsersController extends Controller
@@ -21,11 +21,7 @@ class UsersController extends Controller
      */
     public function index(Request $request)
     {
-        $data = $request->json();
-        if (!($user = User::where('is_active', true)->find($data->user_id))) {
-            abort(404, 'Invalid user.');
-        }
-
+        $user = User::getActiveUser($request->get('user_id'));
         return response([
             'id' => $user->id,
             'userId' => $user->account,
