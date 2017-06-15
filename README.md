@@ -18,9 +18,20 @@
 $ composer install
 ```
 
+### Dockerを利用する場合
+
+以下コマンドを実行してください。
+
+```
+$ cd ./docker && docker-compose build
+$ LOCAL_IP=<your local ip> docker-compose up
+$ # Macの場合
+$ LOCAL_IP=$(ipconfig getifaddr en1) docker-compose up
+```
+
 ## ログ出力
 
-変数`LOG_DIR`に`web-api.log`としてログ出力します。
+変数`LOG_DIR`に`web-api.log`としてログ出力します（未設定もしくはブランクの場合はプロジェクトルートの`storage/logs`ディレクトリ）。
 
 ## DB接続
   
