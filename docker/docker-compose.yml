@@ -1,0 +1,22 @@
+version: '2'
+services:
+  api:
+    image: busybox
+    volumes:
+      - ../:/usr/share/nginx/html
+
+  nginx-api:
+    build: ./nginx
+    volumes_from: [api]
+    ports:
+      - 80:80
+    links:
+      - php7-api
+
+  php7-api:
+    build: ./php-fpm
+    volumes_from: [api]
+    expose:
+      - 9000
+    extra_hosts:
+      - dockerhost:${LOCAL_IP}
