@@ -15,9 +15,9 @@ class CreateTokensTable extends Migration
     {
         Schema::create('tokens', function(Blueprint $table) {
             $table->increments('id')->comment('サロゲートキー');
-            $table->integer('user_id', 10)->unsigned()->comment('ユーザID');
+            $table->integer('user_id')->unsigned()->comment('ユーザID');
             $table->string('token', 50)->comment('トークン');
-            $table->integer('expire', 3)->nullable()->comment('有効期限（分）');
+            $table->tinyInteger('expire')->nullable()->comment('有効期限（分）');
             $table->string('environment', 20)->comment('利用環境');
             $table->dateTime('created')->comment('生成日時');
 
