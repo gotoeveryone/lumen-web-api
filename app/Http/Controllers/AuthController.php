@@ -33,7 +33,7 @@ class AuthController extends Controller
         // ユーザが取得できない、またはパスワードが異なる場合は403
         $user = User::where('account', $account)->where('is_active', true)->first();
         if (!$user || !app('hash')->check($password, $user->password)) {
-            abort(403, 'Invalid user.');
+            abort(Response::HTTP_FORBIDDEN, 'Invalid user.');
         }
 
         // ログイン処理
@@ -45,7 +45,7 @@ class AuthController extends Controller
         // トークンを返す
         return response([
             'access_token' => $token,
-        ], 200);
+        ], Response::HTTP_OK);
     }
 
     /**
@@ -61,6 +61,6 @@ class AuthController extends Controller
         ]);
 
         Token::deleteToken($request->get('access_token'));
-        return response('', 204);
+        return response('', Response::HTTP_NO_CONTENT);
     }
 }

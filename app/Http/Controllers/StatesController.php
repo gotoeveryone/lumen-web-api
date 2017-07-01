@@ -25,6 +25,6 @@ class StatesController extends Controller
             'environment' => env('APP_ENV'),
             'logLevel' => env('APP_LOG_LEVEL'),
             'timeZone' => env('APP_TIMEZONE'),
-        ], 200);
+        ], Response::HTTP_OK);
     }
 }
