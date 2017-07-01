@@ -49,8 +49,7 @@ class MailController extends Controller
         Event::fire(new SendMail($user, $history));
 
         return response([
-            'code' => 200,
-            'message' => 'Mail sended.',
-        ], 200);
+            'result' => 'Mail sended.',
+        ], Response::HTTP_OK);
     }
 }

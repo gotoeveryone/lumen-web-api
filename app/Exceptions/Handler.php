@@ -4,6 +4,7 @@ namespace App\Exceptions;
 
 use Exception;
 use Log;
+use Illuminate\Http\Response;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -48,12 +49,12 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Exception $e)
     {
-        $code = 500;
+        $code = Response::HTTP_INTERNAL_SERVER_ERROR;
         $message = $e->getMessage();
         if ($e instanceof ModelNotFoundException) {
-            $code = 404;
+            $code = Response::HTTP_NOT_FOUND;
         } elseif ($e instanceof ValidationException) {
-            $code = 400;
+            $code = Response::HTTP_BAD_REQUEST;
         } elseif ($e instanceof HttpException) {
             $code = $e->getStatusCode();
         }
@@ -76,18 +77,6 @@ class Handler extends ExceptionHandler
      */
     private function getDefault(int $code)
     {
-        switch ($code) {
-            case 400:
-                return 'Bad Request';
-            case 401:
-                return 'Unauthorized';
-            case 403:
-                return 'Access Denied';
-            case 404:
-                return 'Not Found';
-            case 405:
-                return 'Method Not Allowed';
-        }
-        return 'Unknown Error';
+        return Response::$statusTexts[$code] ?? 'Unknown Error';
     }
 }

@@ -29,6 +29,6 @@ class UsersController extends Controller
             'sex' => $user->sex,
             'mailAddress' => $user->mail_address,
             'role' => $user->role,
-        ], 200);
+        ], Response::HTTP_OK);
     }
 }
