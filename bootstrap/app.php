@@ -70,6 +70,7 @@ $app->singleton(
 
 $app->routeMiddleware([
     'auth' => App\Http\Middleware\Authenticate::class,
+    'query' => App\Http\Middleware\QueryLog::class,
 ]);
 
 /*
