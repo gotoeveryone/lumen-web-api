@@ -12,8 +12,9 @@
 */
 
 $app->get('/', 'StatesController@index');
-$app->group(['prefix' => 'v1'], function($app) {
+$app->group(['prefix' => 'v1', 'middleware' => 'query'], function($app) {
     $app->get('/', 'StatesController@index');
+    $app->delete('/tokens/delete', 'TokensController@deleteExpired');
 
     $app->group(['prefix' => 'auth/'], function($app) {
         $app->post('/login', 'AuthController@login');

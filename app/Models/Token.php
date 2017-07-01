@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use DB;
 use Redis;
 use Carbon\Carbon;
 
@@ -117,11 +118,24 @@ class Token extends BaseModel
     }
 
     /**
+     * 期限切れのトークンを削除します。
+     *
+     * @return void
+     */
+    public static function deleteExpired()
+    {
+        $now = Carbon::now();
+        return self::where(
+            DB::raw('DATE_ADD(created, INTERVAL expire second)'), '<', $now
+        )->delete();
+    }
+
+    /**
      * Redisを利用するかどうかを判定します。
      *
      * @return boolean Redisを利用する場合はtrue
      */
-    private static function useRedis()
+    public static function useRedis()
     {
         return (bool) env('REDIS_HOST');
     }
