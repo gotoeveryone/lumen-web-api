@@ -16,19 +16,12 @@ class User extends BaseModel implements
     use Authenticatable, Authorizable, CanResetPassword;
 
     /**
-     * 当モデルでは登録・更新日付を利用しない
-     * 
-     * @var boolean
-     */
-    public $timestamps = false;
-
-    /**
      * The attributes that are mass assignable.
      *
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password',
+        'account', 'name', 'password', 'sex', 'mail_address', 'sub_mail_address', 'role', 'is_active',
     ];
 
     /**
