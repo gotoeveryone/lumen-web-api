@@ -30,11 +30,12 @@ abstract class TestCase extends Laravel\Lumen\Testing\TestCase
      * トークン取得
      *
      * @param string $account
+     * @param string $password
      * @return string
      */
-    protected function getToken(string $account): string
+    protected function getToken(string $account, string $password): string
     {
-        $this->makeToken($account);
+        $this->makeToken($account, $password);
         $json = json_decode($this->response->getContent());
         return $json->access_token;
     }
@@ -43,13 +44,14 @@ abstract class TestCase extends Laravel\Lumen\Testing\TestCase
      * トークン生成URL呼び出し
      *
      * @param string $account
+     * @param string $password
      * @return void
      */
-    protected function makeToken(string $account)
+    protected function makeToken($account = '', $password = '')
     {
         $this->post('/v1/auth/login', [
             'account' => $account,
-            'password' => 'testtest',
+            'password' => $password,
         ]);
     }
 }

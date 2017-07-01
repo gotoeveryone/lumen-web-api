@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use Closure;
+use Illuminate\Http\Response;
 use App\Models\Token;
 
 /**
@@ -24,7 +25,7 @@ class Authenticate
     {
         // トークンが取得できない
         if (!($token = $request->get('access_token')) || !($data = Token::getData($token))) {
-            abort(403, 'Access token is invalid');
+            abort(Response::HTTP_UNAUTHORIZED, 'Access token is invalid');
         }
 
         // 取得したデータをリクエストに付与

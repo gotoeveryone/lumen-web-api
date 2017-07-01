@@ -70,7 +70,7 @@ class AuthorizationTest extends TestCase
     public function testToken()
     {
         $successUser = self::$users['success'];
-        $this->makeToken($successUser->account);
+        $this->makeToken($successUser->account, 'testtest');
 
         $this->assertEquals(200, $this->response->getStatusCode());
         $json = json_decode($this->response->getContent());
@@ -78,16 +78,28 @@ class AuthorizationTest extends TestCase
     }
 
     /**
-     * トークン取得：失敗
+     * トークン取得：認証エラー
      *
      * @return void
      */
-    public function testTokenFailed()
+    public function testTokenNotActiveUser()
     {
         $failUser = self::$users['fail'];
-        $this->makeToken($failUser->account);
+        $this->makeToken($failUser->account, 'testtest');
 
-        $this->assertEquals(403, $this->response->getStatusCode());
+        $this->assertEquals(401, $this->response->getStatusCode());
+    }
+
+    /**
+     * トークン取得：バリデーションエラー
+     *
+     * @return void
+     */
+    public function testTokenInvalid()
+    {
+        $this->makeToken();
+
+        $this->assertEquals(400, $this->response->getStatusCode());
     }
 
     /**
@@ -98,7 +110,7 @@ class AuthorizationTest extends TestCase
     public function testUsers()
     {
         $successUser = self::$users['success'];
-        $token = $this->getToken($successUser->account);
+        $token = $this->getToken($successUser->account, 'testtest');
         $this->get('/v1/users?access_token='.$token);
         $this->assertEquals(200, $this->response->getStatusCode());
 
@@ -108,5 +120,27 @@ class AuthorizationTest extends TestCase
         $this->assertEquals($json->userName, $successUser->name);
         $this->assertEquals($json->sex, $successUser->sex);
         $this->assertEquals($json->role, $successUser->role);
+    }
+
+    /**
+     * ユーザ取得：失敗（トークン不正）
+     *
+     * @return void
+     */
+    public function testUsersInvalidToken()
+    {
+        $this->get('/v1/users');
+        $this->assertEquals(401, $this->response->getStatusCode());
+    }
+
+    /**
+     * ユーザ取得：失敗（トークン無し）
+     *
+     * @return void
+     */
+    public function testUsersNotHasToken()
+    {
+        $this->get('/v1/users?access_token='.random_bytes(50));
+        $this->assertEquals(401, $this->response->getStatusCode());
     }
 }
