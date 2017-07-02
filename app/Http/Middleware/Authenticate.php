@@ -23,8 +23,8 @@ class Authenticate
      */
     public function handle($request, Closure $next, $guard = null)
     {
-        // トークンが取得できない
-        if (!($token = $request->get('access_token')) || !($data = Token::getData($token))) {
+        // 認証情報が取得できない
+        if (!($data = Token::getData($request))) {
             abort(Response::HTTP_UNAUTHORIZED, 'Access token is invalid');
         }
 

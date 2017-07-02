@@ -29,6 +29,11 @@ $ # Macの場合
 $ LOCAL_IP=$(ipconfig getifaddr en1) docker-compose up
 ```
 
+## 認証・認可
+
+1. `/v1/auth/login`に`account`と`password`を渡すことで認証を行う。
+2. 認可が必要なパスについては、Authorizationヘッダに`Bearer トークン`という形式で各種リソースへのアクセスを行う。
+
 ## ログ出力
 
 変数`LOG_DIR`に`web-api.log`としてログ出力します（未設定もしくはブランクの場合はプロジェクトルートの`storage/logs`ディレクトリ）。

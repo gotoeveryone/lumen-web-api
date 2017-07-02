@@ -68,11 +68,12 @@ class Token extends BaseModel
     /**
      * トークンから保存している情報を取得する。
      *
-     * @param string $token
+     * @param string $request
      * @return array|false データがあればその情報、無ければfalse
      */
-    public static function getData(string $token)
+    public static function getData($request)
     {
+        $token = self::getToken($request);
         if (self::useRedis()) {
             // データが取得できない
             // 有効期限切れの場合も同様
@@ -105,9 +106,9 @@ class Token extends BaseModel
      * @param string $token
      * @return void
      */
-    public static function deleteToken(string $token)
+    public static function deleteToken($request)
     {
-        // Redisから削除
+        $token = self::getToken($request);
         if (self::useRedis()) {
             if ($token && Redis::get($token)) {
                 Redis::del($token);
@@ -138,5 +139,20 @@ class Token extends BaseModel
     public static function useRedis()
     {
         return (bool) env('REDIS_HOST');
+    }
+
+    /**
+     * リクエストからアクセストークンを取得します。
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return string
+     */
+    private static function getToken($request)
+    {
+        $authorization = $request->headers->get('Authorization');
+        if (($pos = strpos($authorization, 'Bearer ')) === false) {
+            return '';
+        }
+        return substr($authorization, strlen('Bearer '));
     }
 }
