@@ -23,28 +23,13 @@ class Authenticate
      */
     public function handle($request, Closure $next, $guard = null)
     {
-        // トークンが取得できない
-        if (!($token = $this->getToken($request)) || !($data = Token::getData($token))) {
+        // 認証情報が取得できない
+        if (!($data = Token::getData($request))) {
             abort(Response::HTTP_UNAUTHORIZED, 'Access token is invalid');
         }
 
         // 取得したデータをリクエストに付与
         $request->merge($data);
         return $next($request);
-    }
-
-    /**
-     * リクエストからアクセストークンを取得します。
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return string
-     */
-    private function getToken($request)
-    {
-        $authorization = $request->headers->get('Authorization');
-        if (($pos = strpos($authorization, 'Bearer ')) === false) {
-            return '';
-        }
-        return substr($authorization, strlen('Bearer '));
     }
 }

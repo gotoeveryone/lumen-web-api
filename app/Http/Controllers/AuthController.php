@@ -56,11 +56,7 @@ class AuthController extends Controller
      */
     public function logout(Request $request)
     {
-        $this->validate($request, [
-            'access_token' => 'required|max:50',
-        ]);
-
-        Token::deleteToken($request->get('access_token'));
+        Token::deleteToken($request);
         return response('', Response::HTTP_NO_CONTENT);
     }
 }
