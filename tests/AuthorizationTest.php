@@ -9,6 +9,11 @@ use App\Models\User;
  */
 class AuthorizationTest extends TestCase
 {
+    /**
+     * テストユーザ一覧
+     *
+     * @var array
+     */
     private static $users = [];
 
     /**
@@ -140,7 +145,7 @@ class AuthorizationTest extends TestCase
      */
     public function testUsersNotHasToken()
     {
-        $this->get('/v1/users?access_token='.random_bytes(50));
+        $this->get('/v1/users?access_token='.str_random(50));
         $this->assertEquals(401, $this->response->getStatusCode());
     }
 }

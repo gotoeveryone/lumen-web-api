@@ -25,9 +25,9 @@ class MailController extends Controller
     public function sendmail(Request $request)
     {
         $this->validate($request, [
-            'to' => 'required|max:500',
-            'cc' => 'max:500',
-            'bcc' => 'max:500',
+            'to' => 'required|email|max:500',
+            'cc' => 'email|max:500',
+            'bcc' => 'email|max:500',
             'subject' => 'required|max:50',
             'body' => 'required|max:500',
         ]);
