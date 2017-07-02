@@ -26,8 +26,8 @@ class MailController extends Controller
     {
         $this->validate($request, [
             'to' => 'required|email|max:500',
-            'cc' => 'email|max:500',
-            'bcc' => 'email|max:500',
+            'cc' => 'nullable|email|max:500',
+            'bcc' => 'nullable|email|max:500',
             'subject' => 'required|max:50',
             'body' => 'required|max:500',
         ]);
