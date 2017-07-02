@@ -97,7 +97,10 @@ class Token extends BaseModel
             return false;
         }
 
-        return (array) $res;
+        return [
+            'user_id' => $res->user_id,
+            'environment' => $res->environment,
+        ];
     }
 
     /**
